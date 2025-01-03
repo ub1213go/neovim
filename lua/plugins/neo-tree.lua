@@ -9,7 +9,7 @@ return {
   },
   config = function()
     require('neo-tree').setup({
-    window = {
+      window = {
         mappings = {
           ["P"] = function(state)
             local node = state.tree:get_node()
