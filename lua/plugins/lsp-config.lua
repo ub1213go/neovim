@@ -12,8 +12,8 @@ return {
         ensure_installed = { 
           "lua_ls",
           "csharp_ls",
-          -- "cssls",
-          -- "css_variables",
+          "cssls",
+          "css_variables",
           "dockerls",
           "html",
           "eslint",
@@ -22,7 +22,6 @@ return {
           -- "pylsp",
           -- "sqlls",
           "volar",
-          -- "cssls",
           "rust_analyzer"
         }
       })
@@ -34,8 +33,8 @@ return {
       local lspconfig = require("lspconfig")
       lspconfig.lua_ls.setup({})
       lspconfig.csharp_ls.setup({})
-      -- lspconfig.cssls.setup({})
-      -- lspconfig.css_variables.setup({})
+      lspconfig.cssls.setup({})
+      lspconfig.css_variables.setup({})
       lspconfig.dockerls.setup({})
       lspconfig.html.setup({})
       lspconfig.eslint.setup({})
