@@ -1,3 +1,21 @@
+-- 全域函式，顯示 buffer 的 label
+function _G.MyWinbar()
+  local ok, label = pcall(vim.api.nvim_buf_get_var, 0, "label")
+  if ok and label ~= "" then
+    return "[" .. label .. "]"
+  else
+    return ""
+  end
+end
+
+-- 設定 winbar 呼叫函式
+vim.o.winbar = "%=%{v:lua.MyWinbar()}"
+
+-- 建立 :Label 指令，幫 buffer 加 label
+vim.api.nvim_create_user_command("Label", function(opts)
+  vim.api.nvim_buf_set_var(0, "label", opts.args)
+end, { nargs = 1 })
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
