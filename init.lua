@@ -16,6 +16,17 @@ vim.api.nvim_create_user_command("Label", function(opts)
   vim.api.nvim_buf_set_var(0, "label", opts.args)
 end, { nargs = 1 })
 
+vim.api.nvim_create_user_command("CopyLabel", function()
+  local ok, label = pcall(vim.api.nvim_buf_get_var, 0, "label")
+  if ok and label ~= "" then
+    -- 將標籤複製到系統剪貼簿 (通常是 '+')
+    vim.fn.setreg('+', label)
+    vim.notify("當前緩衝區標籤已複製到剪貼簿: " .. label, vim.log.levels.INFO)
+  else
+    vim.notify("當前緩衝區沒有設定標籤，無法複製。", vim.log.levels.INFO)
+  end
+end, {})
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
