@@ -27,6 +27,10 @@ vim.api.nvim_create_user_command("CopyLabel", function()
   end
 end, {})
 
+vim.api.nvim_create_user_command("CdVimrc", function()
+      vim.cmd("cd " .. vim.fn.stdpath("config"))
+end, { desc = "cd to Neovim config directory" })
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
