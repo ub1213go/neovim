@@ -31,6 +31,33 @@ vim.api.nvim_create_user_command("CdVimrc", function()
       vim.cmd("Neotree " .. vim.fn.stdpath("config"))
 end, { desc = "cd to Neovim config Neotree directory" })
 
+-- 刪除 hidden buffers 的函數
+local function delete_hidden_buffers(force)
+  local deleted = 0
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) and vim.fn.bufwinnr(buf) == -1 then
+      -- 檢查是否有未保存的更改
+      local modified = vim.api.nvim_buf_get_option(buf, 'modified')
+      if force or not modified then
+        pcall(vim.api.nvim_buf_delete, buf, { force = force })
+        deleted = deleted + 1
+      end
+    end
+  end
+  print('Deleted ' .. deleted .. ' hidden buffer(s)')
+end
+
+-- 創建自定義指令
+vim.api.nvim_create_user_command('DeleteHidden', function(opts)
+  delete_hidden_buffers(opts.bang)
+end, {
+  bang = true,  -- 支援 ! 強制刪除
+  desc = 'Delete hidden buffers'
+})
+
+-- 可選：設置快捷鍵
+vim.keymap.set('n', '<leader>bh', '<cmd>DeleteHidden<CR>', { desc = 'Delete hidden buffers' })
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
