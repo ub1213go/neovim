@@ -25,6 +25,17 @@ local deploy_configs = {
         backend_path = "D:\\project\\SAGCore3\\SAGCoreMIS",
         runner = "run 3",
     },
+    apsv2 = {
+        name = "Apsv2",
+        frontend_path = "D:\\project\\APSv2\\frontend",
+        backend_path = "D:\\project\\APSv2",
+        runner = "run 9",
+    },
+    cli2 = {
+        name = "Cli2",
+        path = "D:\\project\\RustTool\\cli2",
+        entry = "src\\main.rs",
+    },
 }
 
 function M.deploy(env)
@@ -98,6 +109,21 @@ function M.deploy_sub(env)
     vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
     vim.fn.chansend(job_id_3, "D: && cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
+end
+
+function M.deploy_simple(env)
+    local config = deploy_configs[env]
+    if not config then
+        print("錯誤: 未知的環境 " .. env)
+        return
+    end
+
+    print("開始建置 " .. config.name .. "...")
+
+    vim.cmd("tab new")
+    local job_id_1 = vim.b.terminal_job_id
+    vim.cmd("Neotree " .. config.path)
+    vim.cmd("e " .. config.path .. "\\" .. config.entry)
 end
 
 return M
