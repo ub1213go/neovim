@@ -1,3 +1,27 @@
+-- 剪貼簿暫存函式
+local config_path = vim.fn.stdpath("config")
+local custom_file = config_path .. "\\custom\\clip_temp.lua"
+
+if vim.fn.filereadable(custom_file) == 1 then
+    local custom = dofile(custom_file)
+
+    vim.api.nvim_create_user_command('Run', function()
+        custom.execute_command('run')
+    end, { desc = "主檔位置建立剪貼簿暫存" })
+
+    vim.api.nvim_create_user_command('Run1', function()
+        custom.execute_command('run1')
+    end, { desc = "Clone 1 位置建立剪貼簿暫存" })
+
+    vim.api.nvim_create_user_command('Run2', function()
+        custom.execute_command('run2')
+    end, { desc = "Clone 2 位置建立剪貼簿暫存" })
+
+    vim.api.nvim_create_user_command('Run3', function()
+        custom.execute_command('run3')
+    end, { desc = "Clone 3 位置建立剪貼簿暫存" })
+end
+
 -- 全域函式，顯示 buffer 的 label
 function _G.MyWinbar()
   local ok, label = pcall(vim.api.nvim_buf_get_var, 0, "label")
@@ -37,8 +61,9 @@ local function delete_hidden_buffers(force)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) and vim.fn.bufwinnr(buf) == -1 then
       -- 檢查是否有未保存的更改
-      local modified = vim.api.nvim_buf_get_option(buf, 'modified')
-      if force or not modified then
+      -- local modified = vim.api.nvim_buf_get_option(buf, 'modified')
+      -- if force or not modified then
+      if force then
         pcall(vim.api.nvim_buf_delete, buf, { force = force })
         deleted = deleted + 1
       end
@@ -55,8 +80,6 @@ end, {
   desc = 'Delete hidden buffers'
 })
 
--- 可選：設置快捷鍵
-vim.keymap.set('n', '<leader>bh', '<cmd>DeleteHidden<CR>', { desc = 'Delete hidden buffers' })
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
