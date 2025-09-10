@@ -1,9 +1,23 @@
--- 剪貼簿暫存函式
 local config_path = vim.fn.stdpath("config")
-local custom_file = config_path .. "\\custom\\clip_temp.lua"
 
-if vim.fn.filereadable(custom_file) == 1 then
-    local custom = dofile(custom_file)
+-- 專案環境部屬
+local custom_project_setup = config_path .. "\\custom\\project_setup.lua"
+if vim.fn.filereadable(custom_project_setup) == 1 then
+    local custom = dofile(custom_project_setup)
+
+    vim.api.nvim_create_user_command('SetupProject', function()
+        custom.deploy('web_dev')
+        custom.deploy_sub('web_dev1')
+        custom.deploy('web_dev2')
+        custom.deploy_sub('web_dev3')
+    end, { desc = "部屬開發專案" })
+end
+
+-- 剪貼簿暫存函式
+local custom_clip_temp = config_path .. "\\custom\\clip_temp.lua"
+
+if vim.fn.filereadable(custom_clip_temp) == 1 then
+    local custom = dofile(custom_clip_temp)
 
     vim.api.nvim_create_user_command('Run', function()
         custom.execute_command('run')
