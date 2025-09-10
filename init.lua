@@ -61,9 +61,8 @@ local function delete_hidden_buffers(force)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) and vim.fn.bufwinnr(buf) == -1 then
       -- 檢查是否有未保存的更改
-      -- local modified = vim.api.nvim_buf_get_option(buf, 'modified')
-      -- if force or not modified then
-      if force then
+      local modified = vim.api.nvim_buf_get_option(buf, 'modified')
+      if force or not modified then
         pcall(vim.api.nvim_buf_delete, buf, { force = force })
         deleted = deleted + 1
       end

@@ -3,22 +3,22 @@ local config_path = vim.fn.stdpath("config")
 local commands = {
     run = {
         exe = config_path .. "\\custom\\cli2.exe",
-        args = "D:\\project\\SAGWebVue\\temp.md",
+        args = "-t D:\\project\\SAGWebVue\\MainPlatform\\temp.md",
         description = "剪貼簿暫存程式 SAGWebVue"
     },
     run1 = {
         exe = config_path .. "\\custom\\cli2.exe",
-        args = "D:\\project\\SAGWebVue1\\temp.md",
+        args = "-t D:\\project\\SAGWebVue1\\MainPlatform\\temp.md",
         description = "剪貼簿暫存程式 SAGWebVue1"
     },
     run2 = {
         exe = config_path .. "\\custom\\cli2.exe",
-        args = "D:\\project\\SAGWebVue2\\temp.md",
+        args = "-t D:\\project\\SAGWebVue2\\MainPlatform\\temp.md",
         description = "剪貼簿暫存程式 SAGWebVue2"
     },
     run3 = {
         exe = config_path .. "\\custom\\cli2.exe",
-        args = "D:\\project\\SAGWebVue3\\temp.md",
+        args = "-t D:\\project\\SAGWebVue3\\MainPlatform\\temp.md",
         description = "剪貼簿暫存程式 SAGWebVue3"
     }
 }
