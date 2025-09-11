@@ -29,6 +29,7 @@ local deploy_configs = {
         name = "Apsv2",
         frontend_path = "D:\\project\\APSv2\\frontend",
         backend_path = "D:\\project\\APSv2",
+        entry = "D:\\project\\APSv2",
         runner = "run 9",
     },
     cli2 = {
@@ -105,7 +106,7 @@ function M.deploy_sub(env)
 
     vim.fn.chansend(job_id_1, "D: && cd " .. config.frontend_path .. "\r\n")
     vim.fn.chansend(job_id_1, config.runner .. "\r\n")
-    vim.fn.chansend(job_id_2, "D: && cd " .. config.backend_path .. "\r\n")
+    vim.fn.chansend(job_id_2, "D: && cd " .. config.entry .. "\r\n")
     vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
     vim.fn.chansend(job_id_3, "D: && cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
