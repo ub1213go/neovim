@@ -105,7 +105,7 @@ function M.deploy_sub(env)
 
     vim.fn.chansend(job_id_1, "D: && cd " .. config.frontend_path .. "\r\n")
     vim.fn.chansend(job_id_1, config.runner .. "\r\n")
-    vim.fn.chansend(job_id_2, "D: && cd " .. config.frontend_path .. "\r\n")
+    vim.fn.chansend(job_id_2, "D: && cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
     vim.fn.chansend(job_id_3, "D: && cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
