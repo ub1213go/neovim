@@ -5,24 +5,28 @@ local deploy_configs = {
         name = "前端主檔",
         frontend_path = "D:\\project\\SAGWebVue\\MainPlatform",
         backend_path = "D:\\project\\SAGCore\\SAGCoreMIS",
+        entry = "D:\\project\\SAGWebVue\\MainPlatform",
         runner = "run",
     },
     web_dev1 = {
         name = "Clone 1",
         frontend_path = "D:\\project\\SAGWebVue1\\MainPlatform",
         backend_path = "D:\\project\\SAGCore1\\SAGCoreMIS",
+        entry = "D:\\project\\SAGWebVue1\\MainPlatform",
         runner = "run 1",
     },
     web_dev2 = {
         name = "Clone 2",
         frontend_path = "D:\\project\\SAGWebVue2\\MainPlatform",
         backend_path = "D:\\project\\SAGCore2\\SAGCoreMIS",
+        entry = "D:\\project\\SAGWebVue2\\MainPlatform",
         runner = "run 2",
     },
     web_dev3 = {
         name = "Clone 3",
         frontend_path = "D:\\project\\SAGWebVue3\\MainPlatform",
         backend_path = "D:\\project\\SAGCore3\\SAGCoreMIS",
+        entry = "D:\\project\\SAGWebVue3\\MainPlatform",
         runner = "run 3",
     },
     apsv2 = {
@@ -66,7 +70,7 @@ function M.deploy(env)
     
     vim.fn.chansend(job_id_1, "D: && cd " .. config.frontend_path .. "\r\n")
     vim.fn.chansend(job_id_1, config.runner .. "\r\n")
-    vim.fn.chansend(job_id_2, "D: && cd " .. config.frontend_path .. "\r\n")
+    vim.fn.chansend(job_id_2, "D: && cd " .. config.entry .. "\r\n")
     vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
     vim.fn.chansend(job_id_3, "D: && cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
