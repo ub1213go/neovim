@@ -21,21 +21,21 @@ local custom_clip_temp = config_path .. "\\custom\\clip_temp.lua"
 if vim.fn.filereadable(custom_clip_temp) == 1 then
     local custom = dofile(custom_clip_temp)
 
-    vim.api.nvim_create_user_command('Run', function()
-        custom.execute_command('run')
-    end, { desc = "主檔位置建立剪貼簿暫存" })
+    vim.api.nvim_create_user_command('Run', function(opts)
+        custom.execute_command('run', opts.args)
+    end, { desc = "主檔位置建立剪貼簿暫存", nargs = '?' })
 
-    vim.api.nvim_create_user_command('Run1', function()
-        custom.execute_command('run1')
-    end, { desc = "Clone 1 位置建立剪貼簿暫存" })
+    vim.api.nvim_create_user_command('Run1', function(opts)
+        custom.execute_command('run1', opts.args)
+    end, { desc = "Clone 1 位置建立剪貼簿暫存", nargs = '?' })
 
-    vim.api.nvim_create_user_command('Run2', function()
-        custom.execute_command('run2')
-    end, { desc = "Clone 2 位置建立剪貼簿暫存" })
+    vim.api.nvim_create_user_command('Run2', function(opts)
+        custom.execute_command('run2', opts.args)
+    end, { desc = "Clone 2 位置建立剪貼簿暫存", nargs = '?' })
 
-    vim.api.nvim_create_user_command('Run3', function()
-        custom.execute_command('run3')
-    end, { desc = "Clone 3 位置建立剪貼簿暫存" })
+    vim.api.nvim_create_user_command('Run3', function(opts)
+        custom.execute_command('run3', opts.args)
+    end, { desc = "Clone 3 位置建立剪貼簿暫存", nargs = '?' })
 end
 
 -- 全域函式，顯示 buffer 的 label
