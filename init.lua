@@ -10,7 +10,7 @@ if vim.fn.filereadable(custom_project_setup) == 1 then
         custom.deploy_sub('web_dev1')
         custom.deploy('web_dev2')
         custom.deploy_sub('web_dev3')
-        custom.deploy('apsv2')
+        --custom.deploy('apsv2')
         custom.deploy_simple('cli2')
     end, { desc = "部屬開發專案" })
 end

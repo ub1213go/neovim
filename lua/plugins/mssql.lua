@@ -5,5 +5,5 @@ return {
     keymap_prefix = "<leader>m"
   },
   -- optional
-  dependencies = { "folke/which-key.nvim" }
+  -- dependencies = { "folke/which-key.nvim" }
 }
