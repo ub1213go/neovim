@@ -40,7 +40,7 @@ return {
       lspconfig.eslint.setup({})
       lspconfig.jsonls.setup({})
       -- lspconfig.remark_ls.setup({})
-      -- lspconfig.pylsp.setup({})
+      lspconfig.pylsp.setup({})
       -- lspconfig.sqlls.setup({})
       lspconfig.volar.setup({})
       -- lspconfig.cssls.setup({})
