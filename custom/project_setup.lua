@@ -40,9 +40,7 @@ function M.deploy_temp()
     print("開始建置 temp")
 
     vim.cmd("tab new")
-    local job_id_1 = vim.b.terminal_job_id
-
-    vim.fn.chansend(job_id_1, "cd C:\\project\\temp\r\n")
+    vim.cmd("Neotree C:\\project\\temp")
 end
 
 function M.deploy_editor(env)
