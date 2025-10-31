@@ -50,15 +50,19 @@ function M.deploy_editor(env)
         return
     end
 
-    print("開始建置 " .. config.name .. "...")
+    print("開始建置 " .. config.name .. " 專案編輯...")
 
-    vim.cmd("tab new")
-    vim.cmd("Label 前端 " .. config.runner)
-    vim.cmd("Neotree " .. config.frontend_path)
-    
-    vim.cmd("tab new")
-    vim.cmd("Label 後端 " .. config.runner)
-    vim.cmd("Neotree " .. config.frontend_path)
+   vim.schedule(function()
+        vim.cmd("tab new")
+        vim.cmd("Label 前端 " .. config.runner)
+        vim.cmd("Neotree " .. config.frontend_path)
+        
+        vim.schedule(function()
+            vim.cmd("tab new")
+            vim.cmd("Label 後端 " .. config.runner)
+            vim.cmd("Neotree " .. config.backend_path)
+        end)
+    end)
 end
 
 function M.deploy(env)
