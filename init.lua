@@ -7,11 +7,12 @@ if vim.fn.filereadable(custom_project_setup) == 1 then
 
     vim.api.nvim_create_user_command('SetupProject', function()
         custom.deploy('web_dev')
-        custom.deploy_sub('web_dev1')
-        custom.deploy('web_dev2')
-        custom.deploy_sub('web_dev3')
+        custom.deploy_editor('web_dev')
+        --custom.deploy_sub('web_dev1')
+        --custom.deploy('web_dev2')
+        --custom.deploy_sub('web_dev3')
         --custom.deploy('apsv2')
-        custom.deploy_simple('cli2')
+        --custom.deploy_simple('cli2')
     end, { desc = "部屬開發專案" })
 end
 
