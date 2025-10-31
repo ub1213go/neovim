@@ -55,16 +55,12 @@ function M.deploy_editor(env)
     print("開始建置 " .. config.name .. "...")
 
     vim.cmd("tab new")
-    local job_id_1 = vim.b.terminal_job_id
     vim.cmd("Label 前端 " .. config.runner)
-
-    vim.fn.chansend(job_id_1, "cd " .. config.frontend_path .. "\r\n")
+    vim.cmd("Neotree " .. config.frontend_path)
     
     vim.cmd("tab new")
-    local job_id_2 = vim.b.terminal_job_id
     vim.cmd("Label 後端 " .. config.runner)
-    
-    vim.fn.chansend(job_id_2, "cd " .. config.backend_path .. "\r\n")
+    vim.cmd("Neotree " .. config.frontend_path)
 end
 
 function M.deploy(env)
