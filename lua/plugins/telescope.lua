@@ -120,13 +120,95 @@ return {
     'nvim-pack/nvim-spectre',
     dependencies = {'nvim-lua/plenary.nvim'},
     keys = {
-      {"<leader>S", function() require("spectre").toggle() end, desc = "開啟 Spectre 搜尋取代"},
-      {"<leader>sw", function() require("spectre").open_visual({select_word=true}) end, desc = "搜尋當前單字"},
-      {"<leader>sp", function() require("spectre").open_file_search({select_word=true}) end, desc = "在當前檔案搜尋"}
+      {"<leader>S", function() 
+        -- 正確的重置方式
+        local spectre = require("spectre")
+        local state = require("spectre.state")
+        
+        -- 強制重置狀態
+        if state.is_running then
+          state.is_running = false
+          vim.notify("重置 Spectre 狀態", vim.log.levels.INFO)
+        end
+        
+        -- 清理可能的殘留 buffer
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local name = vim.api.nvim_buf_get_name(buf)
+          if name:match("spectre_panel") then
+            pcall(vim.api.nvim_buf_delete, buf, {force = true})
+          end
+        end
+        
+        spectre.toggle()
+      end, desc = "開啟 Spectre 搜尋取代"},
+      
+      {"<leader>sw", function() 
+        local state = require("spectre.state")
+        state.is_running = false
+        require("spectre").open_visual({select_word=true})
+      end, desc = "搜尋當前單字"},
+      
+      {"<leader>sp", function() 
+        local state = require("spectre.state")
+        state.is_running = false
+        require("spectre").open_file_search({select_word=true})
+      end, desc = "在當前檔案搜尋"},
+      
+      -- 手動重置快捷鍵
+      {"<leader>sR", function()
+        pcall(function() require("spectre").close() end)
+        require("spectre.state").is_running = false
+        
+        -- 清理 buffer
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local name = vim.api.nvim_buf_get_name(buf)
+          if name:match("spectre_panel") then
+            pcall(vim.api.nvim_buf_delete, buf, {force = true})
+          end
+        end
+        
+        vim.notify("Spectre 已完全重置", vim.log.levels.INFO)
+      end, desc = "重置 Spectre"},
     },
     config = function()
-      -- 使用完全預設的 Spectre 配置
-      require('spectre').setup()
+      local is_windows = vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1
+      
+      require('spectre').setup({
+        replace_engine = {
+          ['sed'] = {
+            cmd = "sed",
+            -- 不使用 args,讓 spectre 自己組合命令
+          },
+        },
+        default = {
+          find = {
+            cmd = "rg",
+          },
+          replace = {
+            cmd = "sed"
+          }
+        },
+        -- 關鍵:設定 sed 的命令格式
+        replace_vim_cmd = "cdo",
+        is_open_target_win = true,
+        is_insert_mode = false,
+      })
+      
+      -- 自動清理:當離開 spectre buffer 時重置狀態
+      vim.api.nvim_create_autocmd("BufLeave", {
+        pattern = "*",
+        callback = function()
+          local buf_name = vim.api.nvim_buf_get_name(0)
+          if buf_name:match("spectre_panel") then
+            vim.defer_fn(function()
+              local ok, state = pcall(require, "spectre.state")
+              if ok then
+                state.is_running = false
+              end
+            end, 100)
+          end
+        end,
+      })
     end
   },
   
