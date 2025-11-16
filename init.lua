@@ -15,6 +15,24 @@ if vim.fn.filereadable(custom_project_setup) == 1 then
         --custom.deploy('apsv2')
         --custom.deploy_simple('cli2')
     end, { desc = "部屬開發專案" })
+
+    vim.api.nvim_create_user_command('SetupProject1', function()
+        custom.deploy('web_dev1')
+        custom.deploy_editor('web_dev1')
+        custom.deploy_temp()
+    end, { desc = "部屬開發專案1" })
+
+    vim.api.nvim_create_user_command('SetupProject2', function()
+        custom.deploy('web_dev2')
+        custom.deploy_editor('web_dev2')
+        custom.deploy_temp()
+    end, { desc = "部屬開發專案2" })
+
+    vim.api.nvim_create_user_command('SetupProject3', function()
+        custom.deploy('web_dev3')
+        custom.deploy_editor('web_dev3')
+        custom.deploy_temp()
+    end, { desc = "部屬開發專案3" })
 end
 
 -- 剪貼簿暫存函式
