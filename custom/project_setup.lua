@@ -8,32 +8,32 @@ local deploy_configs = {
         entry = "C:\\project\\SAGWebVue\\MainPlatform",
         runner = "run",
     },
-    --web_dev1 = {
-    --    name = "Clone 1",
-    --    frontend_path = "C:\\project\\SAGWebVue1\\MainPlatform",
-    --    backend_path = "C:\\project\\SAGCore1\\SAGCoreMIS",
-    --    entry = "C:\\project\\SAGWebVue1\\MainPlatform",
-    --    runner = "run 1",
-    --},
-    --web_dev2 = {
-    --    name = "Clone 2",
-    --    frontend_path = "C:\\project\\SAGWebVue2\\MainPlatform",
-    --    backend_path = "C:\\project\\SAGCore2\\SAGCoreMIS",
-    --    entry = "C:\\project\\SAGWebVue2\\MainPlatform",
-    --    runner = "run 2",
-    --},
-    --web_dev3 = {
-    --    name = "Clone 3",
-    --    frontend_path = "C:\\project\\SAGWebVue3\\MainPlatform",
-    --    backend_path = "C:\\project\\SAGCore3\\SAGCoreMIS",
-    --    entry = "C:\\project\\SAGWebVue3\\MainPlatform",
-    --    runner = "run 3",
-    --},
-    --cli2 = {
-    --    name = "Cli2",
-    --    path = "C:\\project\\RustTool\\cli2",
-    --    entry = "src\\main.rs",
-    --},
+    web_dev1 = {
+        name = "Clone 1",
+        frontend_path = "C:\\project\\SAGWebVue1\\MainPlatform",
+        backend_path = "C:\\project\\SAGCore1\\SAGCoreMIS",
+        entry = "C:\\project\\SAGWebVue1\\MainPlatform",
+        runner = "run 1",
+    },
+    web_dev2 = {
+        name = "Clone 2",
+        frontend_path = "C:\\project\\SAGWebVue2\\MainPlatform",
+        backend_path = "C:\\project\\SAGCore2\\SAGCoreMIS",
+        entry = "C:\\project\\SAGWebVue2\\MainPlatform",
+        runner = "run 2",
+    },
+    web_dev3 = {
+        name = "Clone 3",
+        frontend_path = "C:\\project\\SAGWebVue3\\MainPlatform",
+        backend_path = "C:\\project\\SAGCore3\\SAGCoreMIS",
+        entry = "C:\\project\\SAGWebVue3\\MainPlatform",
+        runner = "run 3",
+    },
+    cli2 = {
+        name = "Cli2",
+        path = "C:\\project\\RustTool\\cli2",
+        entry = "src\\main.rs",
+    },
 }
 
 function M.deploy_temp()
