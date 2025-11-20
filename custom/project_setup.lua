@@ -81,24 +81,26 @@ function M.deploy(env)
     vim.cmd("vsplit")
     vim.cmd("wincmd l")
     vim.cmd("terminal")
-    local job_id_2 = vim.b.terminal_job_id
-    vim.cmd("Label " .. config.runner)
-    
-    vim.cmd("vsplit")
-    vim.cmd("wincmd l")
-    vim.cmd("terminal")
     local job_id_3 = vim.b.terminal_job_id
     vim.cmd("Label " .. config.runner)
     
     vim.fn.chansend(job_id_1, "cd " .. config.frontend_path .. "\r\n")
     vim.fn.chansend(job_id_1, config.runner .. "\r\n")
-    vim.fn.chansend(job_id_2, "cd " .. config.entry .. "\r\n")
-    vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
     vim.fn.chansend(job_id_3, "cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
+    
+   vim.schedule(function()
+        vim.cmd("tab terminal")
+        local job_id_2 = vim.b.terminal_job_id
+        vim.cmd("Label " .. config.runner)
+        
+        vim.fn.chansend(job_id_2, "cd " .. config.entry .. "\r\n")
+        vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
+    end)
 end
 
 function M.deploy_sub(env)
+    -- 棄用
     local config = deploy_configs[env]
     if not config then
         print("錯誤: 未知的環境 " .. env)
