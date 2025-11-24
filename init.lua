@@ -91,6 +91,16 @@ vim.api.nvim_create_user_command("CdVimrc", function()
       vim.cmd("Neotree " .. vim.fn.stdpath("config"))
 end, { desc = "cd to Neovim config Neotree directory" })
 
+-- 複製檔案路徑與行號範圍
+vim.api.nvim_create_user_command('Cur', function()
+  local filepath = vim.fn.expand('%:p')
+  local start_line = vim.fn.line("'<")
+  local end_line = vim.fn.line("'>")
+  local result = string.format("%s#%d-%d", filepath, start_line, end_line)
+  vim.fn.setreg('+', result)
+  vim.notify("已複製: " .. result, vim.log.levels.INFO)
+end, { range = true, desc = "複製檔案路徑與選取的行號範圍" })
+
 -- 刪除 hidden buffers 的函數
 local function delete_hidden_buffers(force)
   local deleted = 0
