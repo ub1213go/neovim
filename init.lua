@@ -56,6 +56,26 @@ if vim.fn.filereadable(custom_clip_temp) == 1 then
     vim.api.nvim_create_user_command('Run3', function(opts)
         custom.execute_command('run3', opts.args)
     end, { desc = "Clone 3 位置建立剪貼簿暫存", nargs = '?' })
+
+    vim.api.nvim_create_user_command("Cpt", function(opts)
+        -- 將 opts.args 分割成 {path, file_name}
+        local args = vim.split(opts.args, "%s+")
+
+        -- 驗證 1 或 2 個參數
+        if #args < 1 or #args > 2 then
+            vim.notify("Cpt 必須提供 1 或 2 個參數：path [file_name]", vim.log.levels.ERROR)
+            return
+        end
+
+        local path = args[0] ~= nil and args[1] or args[1]  -- 實際上 args[1] 就是第一個
+        local file_name = args[2]                          -- 可能不存在
+
+        -- 呼叫你的原本 function
+        custom.execute_clip_to("clipTo", path, file_name)
+    end, {
+        desc = "指定位置建立剪貼簿暫存",
+        nargs = "*",
+    })
 end
 
 -- 全域函式，顯示 buffer 的 label
