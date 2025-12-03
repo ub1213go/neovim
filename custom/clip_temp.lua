@@ -87,9 +87,9 @@ function M.execute_clip_to(cmd_key, path, file_name)
             --on_stdout = function(_, data) 
             --    if data then print("STDOUT:", table.concat(data, "\n")) end
             --end,
-            on_stderr = function(_, data) 
-                if data then print("STDERR:", table.concat(data, "\n")) end
-            end,
+            --on_stderr = function(_, data) 
+            --    if data then print("STDERR:", table.concat(data, "\n")) end
+            --end,
             on_exit = function(_, exit_code)
                 if exit_code == 0 then
                     vim.notify("指令執行完成", vim.log.levels.INFO)
