@@ -52,7 +52,7 @@ function M.deploy_editor(env)
 
     print("開始建置 " .. config.name .. " 專案編輯...")
 
-   vim.schedule(function()
+    vim.schedule(function()
         vim.cmd("tab new")
         vim.cmd("Label 前端 " .. config.runner)
         vim.cmd("Neotree " .. config.frontend_path)
@@ -88,6 +88,9 @@ function M.deploy(env)
     vim.fn.chansend(job_id_1, config.runner .. "\r\n")
     vim.fn.chansend(job_id_3, "cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
+
+    vim.cmd("set titlestring=" .. config.runner)
+    vim.cmd("set title")
     
    vim.schedule(function()
         vim.cmd("tab terminal")
