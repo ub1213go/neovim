@@ -89,10 +89,10 @@ function M.deploy(env)
     vim.fn.chansend(job_id_3, "cd " .. config.backend_path .. "\r\n")
     vim.fn.chansend(job_id_3, config.runner .. "\r\n")
 
-    vim.cmd("set titlestring=" .. config.runner)
     vim.cmd("set title")
+    vim.cmd("set titlestring=" .. string.gsub(config.runner, " ", "_"))
     
-   vim.schedule(function()
+    vim.schedule(function()
         vim.cmd("tab terminal")
         local job_id_2 = vim.b.terminal_job_id
         vim.cmd("Label " .. config.runner)
