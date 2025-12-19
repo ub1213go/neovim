@@ -34,6 +34,14 @@ local deploy_configs = {
         path = "C:\\project\\RustTool\\cli2",
         entry = "src\\main.rs",
     },
+    yew = {
+        name = "Yew",
+        path = "C:\\project\\yew-app",
+        frontend_path = "C:\\project\\yew-app\\frontend",
+        backend_path = "C:\\project\\yew-app\\backend",
+        frontend_runner = "trunk serve",
+        backend_runner = "cargo run"
+    }
 }
 
 function M.deploy_temp()
@@ -156,6 +164,34 @@ function M.deploy_simple(env)
     local job_id_1 = vim.b.terminal_job_id
     vim.cmd("Neotree " .. config.path)
     vim.cmd("e " .. config.path .. "\\" .. config.entry)
+end
+
+function M.deploy_yew(env)
+    local config = deploy_configs[env]
+    if not config then
+        print("錯誤: 未知的環境 " .. env)
+        return
+    end
+
+    print("開始建置 " .. config.name .. "...")
+
+    vim.cmd("tab terminal")
+    local job_id_1 = vim.b.terminal_job_id
+    vim.cmd("Label " .. "前端")
+    
+    vim.cmd("vsplit")
+    vim.cmd("wincmd l")
+    vim.cmd("terminal")
+    local job_id_3 = vim.b.terminal_job_id
+    vim.cmd("Label " .. "後端")
+    
+    vim.fn.chansend(job_id_1, "cd " .. config.frontend_path .. "\r\n")
+    vim.fn.chansend(job_id_1, config.frontend_runner .. "\r\n")
+    vim.fn.chansend(job_id_3, "cd " .. config.backend_path .. "\r\n")
+    vim.fn.chansend(job_id_3, config.backend_runner .. "\r\n")
+
+    vim.cmd("set title")
+    vim.cmd("set titlestring=" .. "yew")
 end
 
 return M

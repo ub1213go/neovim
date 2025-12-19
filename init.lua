@@ -33,6 +33,10 @@ if vim.fn.filereadable(custom_project_setup) == 1 then
         custom.deploy_editor('web_dev3')
         custom.deploy_temp()
     end, { desc = "部屬開發專案3" })
+
+    vim.api.nvim_create_user_command('SetupProjectYew', function()
+        custom.deploy_yew('yew')
+    end, { desc = "部屬開發專案後台" })
 end
 
 -- 剪貼簿暫存函式
