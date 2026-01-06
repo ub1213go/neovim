@@ -44,11 +44,11 @@ local deploy_configs = {
     }
 }
 
-function M.deploy_temp()
+function M.deploy_doc()
     print("開始建置 temp")
 
     vim.cmd("tab new")
-    vim.cmd("Neotree C:\\project\\temp")
+    vim.cmd("Neotree C:\\project\\doc")
 end
 
 function M.deploy_editor(env)
