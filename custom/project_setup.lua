@@ -48,7 +48,7 @@ function M.deploy_doc()
     print("開始建置 temp")
 
     vim.cmd("tab new")
-    vim.cmd("Neotree C:\\project\\doc")
+    vim.cmd("Neotree C:\\project\\docs")
 end
 
 function M.deploy_editor(env)
@@ -100,14 +100,14 @@ function M.deploy(env)
     vim.cmd("set title")
     vim.cmd("set titlestring=" .. string.gsub(config.runner, " ", "_"))
     
-    vim.schedule(function()
-        vim.cmd("tab terminal")
-        local job_id_2 = vim.b.terminal_job_id
-        vim.cmd("Label " .. config.runner)
-        
-        vim.fn.chansend(job_id_2, "cd " .. config.entry .. "\r\n")
-        vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
-    end)
+    --vim.schedule(function()
+    --    vim.cmd("tab terminal")
+    --    local job_id_2 = vim.b.terminal_job_id
+    --    vim.cmd("Label " .. config.runner)
+    --    
+    --    vim.fn.chansend(job_id_2, "cd " .. config.entry .. "\r\n")
+    --    vim.fn.chansend(job_id_2, "claude --dangerously-skip-permissions" .. "\r\n")
+    --end)
 end
 
 function M.deploy_sub(env)
