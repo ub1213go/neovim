@@ -39,6 +39,24 @@ if vim.fn.filereadable(custom_project_setup) == 1 then
     end, { desc = "部屬開發專案後台" })
 end
 
+-- 建立一個名為 "Title" 的指令
+vim.api.nvim_create_user_command('Title', function(opts)
+    -- 獲取使用者輸入的參數 (xxxxx)
+    local new_title = opts.args
+    
+    -- 如果使用者有輸入內容才進行設定
+    if new_title ~= "" then
+        vim.opt.title = true
+        vim.opt.titlestring = new_title
+        print("標題已設定為: " .. new_title)
+    else
+        print("請輸入標題內容，例如: :Title MyProject")
+    end
+end, {
+    nargs = 1, -- 設定只需要一個參數
+    desc = "快速設定 Neovim 視窗標題",
+})
+
 -- 剪貼簿暫存函式
 local custom_clip_temp = config_path .. "\\custom\\clip_temp.lua"
 
