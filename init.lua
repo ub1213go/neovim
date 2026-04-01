@@ -1,3 +1,10 @@
+-- 設定 <leader>cp 複製當前檔案的絕對路徑 (Copy Path)
+vim.keymap.set('n', '<leader>cp', function()
+  local path = vim.fn.expand('%:p') -- 取得絕對路徑
+  vim.fn.setreg('+', path)          -- 寫入系統剪貼簿寄存器 (+)
+  vim.notify('已複製絕對路徑: ' .. path) -- 顯示通知（選配）
+end, { desc = 'Copy current file absolute path' })
+
 local config_path = vim.fn.stdpath("config")
 
 -- 專案環境部屬
