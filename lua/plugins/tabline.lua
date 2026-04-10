@@ -1,6 +1,6 @@
 return {
   'nanozuki/tabby.nvim',
-  event = 'VimEnter', -- 啟動時載入
+  event = 'VimEnter',
   dependencies = 'nvim-tree/nvim-web-devicons',
   config = function()
     local theme = {
@@ -15,43 +15,49 @@ return {
     require('tabby.tabline').set(function(line)
       return {
         {
-          { '  ', hl = theme.head },
-          line.sep('', theme.head, theme.fill),
+          { ' NVIM ', hl = theme.head },
+          '|',
         },
         line.tabs().foreach(function(tab)
           local hl = tab.is_current() and theme.current_tab or theme.tab
-          -- 核心邏輯：優先讀取我們自訂的變數 'tab_title'，若無則顯示預設名稱
+          
+          -- 核心邏輯：優先讀取自訂變數 'tab_title'
           local success, custom_name = pcall(vim.api.nvim_tabpage_get_var, tab.id, 'tab_title')
           local name = success and custom_name or tab.name()
 
+          -- 使用簡單的 [ ] 包裹目前的標籤
+          local prefix = tab.is_current() and '[' or ' '
+          local suffix = tab.is_current() and ']' or ' '
+
           return {
-            line.sep('', hl, theme.fill),
-            tab.is_current() and '' or '󰆣',
+            prefix,
             tab.number(),
             name,
-            tab.close_btn('󰅖'),
-            line.sep('', hl, theme.fill),
+            suffix,
+            hl = hl,
+            margin = ' ',
           }
         end),
         line.spacer(),
+        -- 右側顯示當前分頁內的視窗清單 (選用，若不需要可刪除這整段)
         line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
+          local hl = win.is_current() and theme.current_tab or theme.win
           return {
-            line.sep('', theme.win, theme.fill),
-            win.is_current() and '' or '',
+            ' (',
             win.buf_name(),
-            line.sep('', theme.win, theme.fill),
+            ') ',
+            hl = hl,
           }
         end),
         {
-          line.sep('', theme.tail, theme.fill),
-          { '  ', hl = theme.tail },
+          '|',
+          { ' TAB ', hl = theme.tail },
         },
         hl = theme.fill,
       }
     end)
 
-    -- 建立自訂指令來固定 Tab 名稱
-    -- 使用方式: :TabRename 專案A
+    -- 指令保持不變： :TabRename 你的名稱
     vim.api.nvim_create_user_command('TabRename', function(opts)
       vim.api.nvim_tabpage_set_var(0, 'tab_title', opts.args)
       vim.cmd('redrawtabline')
