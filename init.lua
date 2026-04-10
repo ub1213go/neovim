@@ -1,3 +1,11 @@
+-- 修改「當前分頁」的名稱
+vim.api.nvim_create_user_command('TabRename', function(opts)
+    -- 將名稱儲存在 Tab 的變數中
+    vim.api.nvim_tabpage_set_var(0, 'tab_title', opts.args)
+    -- 通知介面更新 (某些插件需要)
+    vim.cmd('redrawtabline')
+end, { nargs = 1 })
+
 -- 設定 <leader>cp 複製當前檔案的絕對路徑 (Copy Path)
 vim.keymap.set('n', '<leader>cp', function()
   local path = vim.fn.expand('%:p') -- 取得絕對路徑
