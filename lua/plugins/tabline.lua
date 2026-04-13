@@ -39,21 +39,6 @@ return {
           }
         end),
         line.spacer(),
-        -- 右側顯示當前分頁內的視窗清單 (選用，若不需要可刪除這整段)
-        line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
-          local hl = win.is_current() and theme.current_tab or theme.win
-          return {
-            ' (',
-            win.buf_name(),
-            ') ',
-            hl = hl,
-          }
-        end),
-        {
-          '|',
-          { ' TAB ', hl = theme.tail },
-        },
-        hl = theme.fill,
       }
     end)
 
