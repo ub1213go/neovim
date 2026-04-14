@@ -148,6 +148,61 @@ vim.api.nvim_create_user_command("CdVimrc", function()
       vim.cmd("Neotree " .. vim.fn.stdpath("config"))
 end, { desc = "cd to Neovim config Neotree directory" })
 
+-- CopyTab 指令，複製當前分頁的自訂名稱
+vim.api.nvim_create_user_command("CopyTab", function()
+    -- 嘗試從當前分頁 (0) 取得 'tab_title' 變數
+    local success, title = pcall(vim.api.nvim_tabpage_get_var, 0, 'tab_title')
+    
+    if success and title ~= "" then
+        -- 複製到系統剪貼簿
+        vim.fn.setreg('+', title)
+        vim.notify("分頁名稱已複製: " .. title, vim.log.levels.INFO)
+    else
+        -- 如果沒有自訂名稱，則取得預設的分頁名稱 (通常是檔案名或路徑)
+        -- 這裡調用 tabby 的邏輯或內建方法
+        local default_name = vim.fn.gettabvar(0, 'tab_title') -- 再次確認
+        if default_name == "" or not success then
+             -- 如果連變數都沒有，就抓取目前視窗的檔案名作為備案
+             default_name = vim.fn.expand('%:t') 
+        end
+        vim.fn.setreg('+', default_name)
+        vim.notify("複製預設分頁名稱: " .. default_name, vim.log.levels.INFO)
+    end
+end, { desc = "複製當前分頁的自訂標題" })
+
+-- CopyCur 指令，複製當前 Buffer 的絕對路徑
+vim.api.nvim_create_user_command('CopyCur', function()
+    local path = vim.fn.expand('%:p') -- 取得絕對路徑
+    if path ~= "" then
+        vim.fn.setreg('+', path)
+        vim.notify("已複製 Buffer 路徑: " .. path, vim.log.levels.INFO)
+    else
+        vim.notify("當前為空 Buffer，無路徑可複製", vim.log.levels.WARN)
+    end
+end, { desc = 'Copy current buffer absolute path' })
+
+-- CopyHistory 指令，複製最後幾條訊息紀錄 (包含錯誤訊息)
+vim.api.nvim_create_user_command('CopyHistory', function(opts)
+    -- 取得所有訊息紀錄
+    local messages = vim.fn.execute('messages')
+    local lines = vim.split(messages, '\n')
+    
+    -- 如果有指定參數 (如 :CopyHistory 5)，則抓取最後 N 行；否則預設抓 10 行
+    local count = tonumber(opts.args) or 10
+    local start_idx = math.max(1, #lines - count + 1)
+    local result = table.concat({unpack(lines, start_idx)}, '\n')
+
+    if result ~= "" then
+        vim.fn.setreg('+', result)
+        vim.notify("已複製最後 " .. count .. " 條訊息紀錄", vim.log.levels.INFO)
+    else
+        vim.notify("訊息紀錄為空", vim.log.levels.WARN)
+    end
+end, { 
+    nargs = '?', 
+    desc = 'Copy last N lines of message history (errors, etc.)' 
+})
+
 -- 複製檔案路徑與行號範圍
 vim.api.nvim_create_user_command('Cur', function()
   local filepath = vim.fn.expand('%:p')
