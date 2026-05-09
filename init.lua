@@ -133,6 +133,32 @@ vim.api.nvim_create_user_command("Label", function(opts)
   vim.api.nvim_buf_set_var(0, "label", opts.args)
 end, { nargs = 1 })
 
+-- buffer 建立時自動以 buffer number 當 label
+vim.api.nvim_create_autocmd({ "BufAdd", "BufNewFile", "BufReadPost" }, {
+  callback = function(args)
+    local ok, existing = pcall(vim.api.nvim_buf_get_var, args.buf, "label")
+    if not ok or existing == "" then
+      vim.api.nvim_buf_set_var(args.buf, "label", tostring(args.buf))
+    end
+  end,
+})
+
+-- 啟動時補抓已存在的 buffer（例如 nvim file1 file2 開起來的）
+for _, b in ipairs(vim.api.nvim_list_bufs()) do
+  if vim.api.nvim_buf_is_loaded(b) then
+    local ok, existing = pcall(vim.api.nvim_buf_get_var, b, "label")
+    if not ok or existing == "" then
+      vim.api.nvim_buf_set_var(b, "label", tostring(b))
+    end
+  end
+end
+
+vim.api.nvim_create_user_command("CopyBn", function()
+  local bn = vim.api.nvim_get_current_buf()
+  vim.fn.setreg('+', tostring(bn))
+  vim.notify("當前 buffer number 已複製到剪貼簿: " .. bn, vim.log.levels.INFO)
+end, {})
+
 vim.api.nvim_create_user_command("CopyLabel", function()
   local ok, label = pcall(vim.api.nvim_buf_get_var, 0, "label")
   if ok and label ~= "" then
