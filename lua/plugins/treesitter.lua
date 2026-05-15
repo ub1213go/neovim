@@ -18,6 +18,8 @@ return {
         "markdown",
         "toml",
         "vue",
+        "hurl", -- 新增這行
+        "json", -- 建議也加上 json，看 hurl 結果時很有用
       },
       
       -- 啟用自動安裝（當打開對應文件類型時）
