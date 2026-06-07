@@ -1,54 +1,57 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  -- 明確鎖在 main 分支（官方重寫版，需 nvim 0.11+）
-  branch = "main",
-  lazy = false,
+  -- 明確釘在 master 分支：官方為 Nvim 0.11 維護的穩定分支（main 需 0.12 nightly）。
+  -- 不釘的話 lazy 會抓到上游已改成預設的 main 分支而壞掉。
+  branch = "master",
   build = ":TSUpdate",
   config = function()
-    require("nvim-treesitter").setup()
+    -- Windows 特定：設定編譯器優先順序
+    require("nvim-treesitter.install").compilers = { "zig", "clang", "gcc" }
 
-    -- Windows 特定：編譯器優先順序。main 分支結構不同，用 pcall 保險。
-    pcall(function()
-      require("nvim-treesitter.install").compilers = { "zig", "clang", "gcc" }
-    end)
+    local config = require("nvim-treesitter.configs")
+    config.setup({
+      -- 明確指定要安裝的語言（避免安裝不必要的 parser）
+      ensure_installed = {
+        "lua",
+        "vim",
+        "vimdoc",
+        "javascript",
+        "typescript",
+        "python", -- 編輯 .ipynb（jupytext percent 格式）內容為 Python
+        "rust",
+        "markdown",
+        "toml",
+        "vue",
+        "hurl",
+        "json",
+      },
 
-    -- 要安裝的 parser（取代舊版 ensure_installed）
-    local ensure = {
-      "lua",
-      "vim",
-      "vimdoc",
-      "javascript",
-      "typescript",
-      "rust",
-      "markdown",
-      "toml",
-      "vue",
-      "hurl",
-      "json",
-    }
+      -- 啟用自動安裝（當打開對應文件類型時）
+      auto_install = true,
 
-    -- 只安裝尚未安裝的，避免每次啟動都重跑
-    local installed = require("nvim-treesitter").get_installed()
-    local missing = vim.tbl_filter(function(lang)
-      return not vim.tbl_contains(installed, lang)
-    end, ensure)
-    if #missing > 0 then
-      require("nvim-treesitter").install(missing)
-    end
+      -- 語法高亮
+      highlight = {
+        enable = true,
+        -- 如果遇到問題可以針對特定語言禁用
+        -- disable = { "rust" },
+      },
 
-    -- 開檔時啟用高亮 + 縮排（取代舊版 highlight.enable / indent.enable）。
-    -- 直接 pcall start：parser 存在（內建或已安裝）就啟用，否則安靜略過。
-    vim.api.nvim_create_autocmd("FileType", {
-      callback = function(args)
-        local buf = args.buf
-        if pcall(vim.treesitter.start, buf) then
-          -- 縮排（main 分支為實驗性功能）
-          vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end
-      end,
+      -- 自動縮排
+      indent = {
+        enable = true,
+        -- disable = { "python" },
+      },
+
+      -- 增量選擇（可選）
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "<CR>",
+          node_incremental = "<CR>",
+          scope_incremental = "<S-CR>",
+          node_decremental = "<BS>",
+        },
+      },
     })
-
-    -- 註：舊版的 incremental_selection 已不在 main 分支核心內，
-    -- 如需此功能可改用 nvim-treesitter-textobjects 或自訂 keymap。
   end,
 }
