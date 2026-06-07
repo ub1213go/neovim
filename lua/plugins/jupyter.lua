@@ -8,6 +8,17 @@ return {
   -- .ipynb 需要在開檔當下就攔截轉換，故不延遲載入
   lazy = false,
   config = function()
+    -- 確保找得到 jupytext 執行檔。jupytext 由 pip 裝在 ~/.local/bin，
+    -- 但從 GUI/桌面捷徑、或沒 source ~/.profile 的終端啟動 nvim 時，
+    -- 該目錄常不在 PATH 裡 → jupytext 指令失敗 → .ipynb 退回顯示原始 JSON。
+    -- 本外掛無指定執行檔路徑的選項，故在此補進 PATH。
+    if vim.fn.exepath("jupytext") == "" then
+      local extra = vim.fn.expand("~/.local/bin")
+      if vim.fn.isdirectory(extra) == 1 then
+        vim.env.PATH = extra .. ":" .. vim.env.PATH
+      end
+    end
+
     require("jupytext").setup({
       -- 編輯格式用 percent：cell 以 `# %%` 分隔，副檔名隨 kernel 自動決定
       -- （Python notebook → 當成 .py 編輯，可享完整語法高亮）。
