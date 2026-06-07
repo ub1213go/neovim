@@ -20,12 +20,16 @@ return {
     end
 
     require("jupytext").setup({
-      -- 編輯格式用 percent：cell 以 `# %%` 分隔，副檔名隨 kernel 自動決定
-      -- （Python notebook → 當成 .py 編輯，可享完整語法高亮）。
-      -- 註：output_extension="auto" 解析出的 .py 不接受 "markdown"，
-      --     若想用 markdown 風格，需改成 output_extension = "md"。
+      -- 編輯格式用 percent：cell 以 `# %%` 分隔。
+      -- output_extension 寫死 "py"（不要用 "auto"）：
+      --   "auto" 會讓 jupytext 用 --to=auto:percent，需 notebook 帶 language_info
+      --   metadata 才推得出副檔名；缺 metadata 的 .ipynb（手寫或某些工具產生）會
+      --   報 "does not have a 'language_info' metadata" → 開檔失敗。
+      --   2026-06-07: auto → py，因為缺 language_info 的 notebook 開不起來（jupytext exit=1）。
+      --   註：寫死 "py" 代表把所有 notebook 當 Python 編輯；若要編非 Python notebook，
+      --       需改成對應副檔名（如 R→"r"）或改回 "auto" 並確保來源檔有 kernelspec。
       style = "percent",
-      output_extension = "auto",
+      output_extension = "py",
       force_ft = nil,
     })
   end,

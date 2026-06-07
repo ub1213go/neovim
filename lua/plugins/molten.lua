@@ -5,8 +5,20 @@ return {
   -- jupytext 會把 .ipynb 轉成 filetype=python；markdown 也支援
   ft = { "python", "markdown" },
   init = function()
-    -- 指向專用 venv 的 python（內含 pynvim），避免動到系統 Python
-    vim.g.python3_host_prog = vim.fn.expand("~/.venvs/neovim/bin/python")
+    -- python3 host：指向含 pynvim 的 venv，避免動到系統 Python。
+    -- 依序嘗試候選路徑，讓本機與 devlab container 共用同一份設定：
+    --   本機         → ~/.venvs/neovim
+    --   devlab 容器  → ~/.venvs/dev（Dockerfile §6 的 uv venv）
+    for _, p in ipairs({
+      "~/.venvs/neovim/bin/python",
+      "~/.venvs/dev/bin/python",
+    }) do
+      local py = vim.fn.expand(p)
+      if vim.fn.executable(py) == 1 then
+        vim.g.python3_host_prog = py
+        break
+      end
+    end
 
     -- tmux 終端無法 inline 顯示圖片 → 關掉圖片需求（文字/表格/錯誤照常顯示）
     vim.g.molten_image_provider = "none"
