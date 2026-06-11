@@ -30,14 +30,19 @@ return {
     vim.g.molten_wrap_output = true
     vim.g.molten_output_win_max_height = 20
   end,
+  -- 鍵位前綴用 <leader>j（Jupyter 助記）。
+  -- 不可用 <leader>m：mssql.nvim 的 keymap_prefix 也是 <leader>m，會撞到
+  -- ml(Cancel)/mr(Refresh)/md(NewDefault)；且 lazy 的 keys 是「全域」觸發、
+  -- 不受 ft 限制，故在 SQL buffer 按 mssql 鍵會誤載 Molten 而報未初始化。
+  --   2026-06-11: m → j，解 mssql.nvim 前綴衝突。
   keys = {
-    { "<leader>mi", "<cmd>MoltenInit<cr>", desc = "Molten: 啟動 kernel" },
-    { "<leader>mo", "<cmd>MoltenEvaluateOperator<cr>", desc = "Molten: 執行 (operator)" },
-    { "<leader>ml", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: 執行當前行" },
-    { "<leader>mr", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: 重跑當前 cell" },
-    { "<leader>mr", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: 執行選取" },
-    { "<leader>ms", "<cmd>MoltenShowOutput<cr>", desc = "Molten: 顯示輸出" },
-    { "<leader>mh", "<cmd>MoltenHideOutput<cr>", desc = "Molten: 隱藏輸出" },
-    { "<leader>md", "<cmd>MoltenDelete<cr>", desc = "Molten: 刪除此 cell 輸出" },
+    { "<leader>ji", "<cmd>MoltenInit<cr>", desc = "Molten: 啟動 kernel" },
+    { "<leader>jo", "<cmd>MoltenEvaluateOperator<cr>", desc = "Molten: 執行 (operator)" },
+    { "<leader>jl", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: 執行當前行" },
+    { "<leader>jr", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: 重跑當前 cell" },
+    { "<leader>jr", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: 執行選取" },
+    { "<leader>js", "<cmd>MoltenShowOutput<cr>", desc = "Molten: 顯示輸出" },
+    { "<leader>jh", "<cmd>MoltenHideOutput<cr>", desc = "Molten: 隱藏輸出" },
+    { "<leader>jd", "<cmd>MoltenDelete<cr>", desc = "Molten: 刪除此 cell 輸出" },
   },
 }
