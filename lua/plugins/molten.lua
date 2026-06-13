@@ -41,8 +41,30 @@ return {
     { "<leader>jl", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: 執行當前行" },
     { "<leader>jr", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: 重跑當前 cell" },
     { "<leader>jr", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: 執行選取" },
+    -- 自動抓游標所在的 # %% cell 範圍並執行（免手動 Visual 選取）。
+    -- molten 不認 # %%，第一次跑某段一定得給範圍；這顆替你算好範圍丟給 MoltenEvaluateRange。
+    {
+      "<leader>jc",
+      function()
+        -- 往回找最近的 # %% 標記（含當前行）；找不到代表在第一個 cell → 從檔首算
+        local mark = vim.fn.search("^# %%", "bcnW")
+        local startln = (mark == 0) and 1 or mark + 1 -- 標記行本身是分隔，從下一行開始送
+        -- 往下找下一個 # %% 標記；找不到 → 一路到檔尾
+        local nextmark = vim.fn.search("^# %%", "nW")
+        local endln = (nextmark == 0) and vim.fn.line("$") or nextmark - 1
+        vim.fn.MoltenEvaluateRange(startln, endln)
+      end,
+      desc = "Molten: 執行游標所在 # %% cell",
+    },
+    -- 整檔當成「一個 cell」一次跑（# %% 被當註解忽略，輸出合併成一坨）
+    { "<leader>ja", "ggVG:<C-u>MoltenEvaluateVisual<cr>", desc = "Molten: 執行整個檔案" },
+    -- 逐一重跑「已執行過」的每個 cell（各自保留各自輸出）
+    { "<leader>jR", "<cmd>MoltenReevaluateAll<cr>", desc = "Molten: 重跑所有 cell" },
     { "<leader>js", "<cmd>MoltenShowOutput<cr>", desc = "Molten: 顯示輸出" },
     { "<leader>jh", "<cmd>MoltenHideOutput<cr>", desc = "Molten: 隱藏輸出" },
+    -- 進輸出浮動視窗，可用 v/y 選取複製、q/<esc> 離開（虛擬文字本身選不到）
+    -- noautocmd 必加：否則進視窗會觸發 autocmd 立刻關掉
+    { "<leader>je", "<cmd>noautocmd MoltenEnterOutput<cr>", desc = "Molten: 進輸出視窗(可複製)" },
     { "<leader>jd", "<cmd>MoltenDelete<cr>", desc = "Molten: 刪除此 cell 輸出" },
   },
 }
