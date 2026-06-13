@@ -66,5 +66,10 @@ return {
     -- noautocmd 必加：否則進視窗會觸發 autocmd 立刻關掉
     { "<leader>je", "<cmd>noautocmd MoltenEnterOutput<cr>", desc = "Molten: 進輸出視窗(可複製)" },
     { "<leader>jd", "<cmd>MoltenDelete<cr>", desc = "Molten: 刪除此 cell 輸出" },
+    -- 中斷 / 重啟 kernel（Jupyter 沒有「暫停→繼續」，只有中斷或整個重來）
+    -- jx：送 KeyboardInterrupt 停掉當前 cell（kernel 不死，變數保留）
+    -- jX：殺掉 kernel 重開 + 清舊輸出（卡死、pyodbc blocking 中斷不掉時用）
+    { "<leader>jx", "<cmd>MoltenInterrupt<cr>", desc = "Molten: 中斷執行(保留變數)" },
+    { "<leader>jX", "<cmd>MoltenRestart!<cr>", desc = "Molten: 重啟 kernel + 清輸出" },
   },
 }
