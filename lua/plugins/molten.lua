@@ -46,12 +46,19 @@ return {
     {
       "<leader>jc",
       function()
+        local last = vim.fn.line("$")
         -- 往回找最近的 # %% 標記（含當前行）；找不到代表在第一個 cell → 從檔首算
         local mark = vim.fn.search("^# %%", "bcnW")
         local startln = (mark == 0) and 1 or mark + 1 -- 標記行本身是分隔，從下一行開始送
         -- 往下找下一個 # %% 標記；找不到 → 一路到檔尾
         local nextmark = vim.fn.search("^# %%", "nW")
-        local endln = (nextmark == 0) and vim.fn.line("$") or nextmark - 1
+        local endln = (nextmark == 0) and last or nextmark - 1
+        -- 防呆：空 cell / 範圍顛倒（游標在只有標記、無內容、或檔尾的 cell）就不送，
+        -- 否則 molten 會用無效範圍建 extmark → 之後讀位置爆 IndexError。
+        if startln > endln or startln > last then
+          vim.notify("Molten: 這個 # %% cell 沒有可執行的內容", vim.log.levels.WARN)
+          return
+        end
         vim.fn.MoltenEvaluateRange(startln, endln)
       end,
       desc = "Molten: 執行游標所在 # %% cell",
