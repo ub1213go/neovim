@@ -25,7 +25,10 @@ return {
 
     -- 輸出以虛擬文字顯示在 cell 下方（不另開浮動視窗，tmux 友善）
     vim.g.molten_virt_text_output = true
-    vim.g.molten_virt_lines_off_by_1 = true
+    -- 2026-06-14: true → false。我們用 <leader>jc 自算 # %% 範圍餵 MoltenEvaluateRange,
+    -- endln 已經停在「下一個 # %% 的前一行」;off_by_1 會再 +1 把輸出推過 markdown marker,
+    -- 導致輸出顯示到 # %% [markdown] block 下方。自算範圍時不需要這個偏移。
+    vim.g.molten_virt_lines_off_by_1 = false
     vim.g.molten_auto_open_output = true
     vim.g.molten_wrap_output = true
     vim.g.molten_output_win_max_height = 20
@@ -78,5 +81,7 @@ return {
     -- jX：殺掉 kernel 重開 + 清舊輸出（卡死、pyodbc blocking 中斷不掉時用）
     { "<leader>jx", "<cmd>MoltenInterrupt<cr>", desc = "Molten: 中斷執行(保留變數)" },
     { "<leader>jX", "<cmd>MoltenRestart!<cr>", desc = "Molten: 重啟 kernel + 清輸出" },
+    -- jD：卸載當前 buffer 的 molten 並關掉它綁的 kernel（真正「關閉」，不是重開）
+    { "<leader>jD", "<cmd>MoltenDeinit<cr>", desc = "Molten: 關閉 kernel(MoltenDeinit)" },
   },
 }
