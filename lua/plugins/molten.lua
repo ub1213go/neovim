@@ -83,5 +83,33 @@ return {
     { "<leader>jX", "<cmd>MoltenRestart!<cr>", desc = "Molten: 重啟 kernel + 清輸出" },
     -- jD：卸載當前 buffer 的 molten 並關掉它綁的 kernel（真正「關閉」，不是重開）
     { "<leader>jD", "<cmd>MoltenDeinit<cr>", desc = "Molten: 關閉 kernel(MoltenDeinit)" },
+    -- jK：關閉「所有」kernel。molten 沒有原生一鍵全關，且 MoltenDeinit 只作用當前 buffer、
+    -- 不能指定 kernel id；故掃過每個 buffer，用 MoltenRunningKernels(true) 判斷該 buffer
+    -- 有無 kernel，有才 MoltenDeinit。用 nvim_buf_call 在不真正切窗下逐 buffer 執行
+    -- （molten 內部讀 current buffer，buf_call 會把它暫設成目標 buffer）。
+    {
+      "<leader>jK",
+      function()
+        -- molten 未載入 / 未初始化時 MoltenRunningKernels 不存在或回 []，pcall 擋掉
+        local ok, all = pcall(vim.fn.MoltenRunningKernels, false)
+        if not ok or vim.tbl_isempty(all) then
+          vim.notify("Molten: 目前沒有執行中的 kernel", vim.log.levels.INFO)
+          return
+        end
+        local n = 0
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_loaded(buf) then
+            vim.api.nvim_buf_call(buf, function()
+              if not vim.tbl_isempty(vim.fn.MoltenRunningKernels(true)) then
+                vim.cmd("MoltenDeinit")
+                n = n + 1
+              end
+            end)
+          end
+        end
+        vim.notify(("Molten: 已關閉 %d 個 buffer 的 kernel"):format(n), vim.log.levels.INFO)
+      end,
+      desc = "Molten: 關閉所有 kernel",
+    },
   },
 }
