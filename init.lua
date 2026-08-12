@@ -1,3 +1,44 @@
+-- 剪貼簿供應者：固定走 OSC 52，不看 $DISPLAY。
+-- 2026-07-31: 原本沒設 g:clipboard，nvim 就自動偵測——只要 $DISPLAY 非空且有 xclip
+--   就挑 xclip。但 ssh -X 進來時 sshd 一定會設 DISPLAY 並在 6010+N 聽著，Windows 那端
+--   VcXsrv 沒開的話那個值是死的，於是一複製就噴
+--   clipboard: error invoking xclip: Can't open display: localhost:10.0。
+--   ~/.bashrc 已經會把死的 DISPLAY 清掉，但那只對「之後才啟動的」進程有效——nvim 一旦
+--   起來，環境就凍住了，清不到它。這裡直接釘死供應者，從源頭不去碰 X。
+--   OSC 52 是走終端機轉義序列（nvim → tmux → 終端機 → Windows 剪貼簿），
+--   VcXsrv 開不開都一樣能用。
+--   ⚠ 這條路還有一個前提在 tmux 那邊：`set -g set-clipboard on`。tmux 的預設值
+--   external 會把「pane 內程式送進來的 OSC 52」直接丟掉（原始碼 input_osc_52()
+--   開頭 if (state != 2) return，off=0/external=1/on=2），而且完全靜默。詳見 ~/.tmux.conf。
+-- 2026-08-03: paste 改成「回傳最後一次 copy 的內容」，不再去讀 unnamed register。
+--   舊做法是 paste_from_unnamed() → vim.fn.getreg('"')，症狀：yank 到 + 之後，只要
+--   碰到 + 就噴 E353: Nothing in register +（copy 其實是成功的，OSC 52 有送出去）。
+--   原因是 nvim 對 clipboard register 有自己的快取層，provider 的 paste 並不是
+--   「每次讀都會被呼叫」，那個 function 讀到的 " 跟外面看到的對不起來——實測外面
+--   getreg('"') = HELLO-WORLD，但同一時刻 provider 回傳的是空 list {}，於是 nvim
+--   認為 + 是空的。
+--   正解是讓 provider 自己記住 copy 過的東西：OSC 52 本來就是單向的（多數終端機
+--   不回應讀取請求），所以「系統剪貼簿現在是什麼」nvim 根本問不到，只能記住自己
+--   寫過什麼。不可以讀 '+'／'*'——那會再打回這個 provider 變成無限遞迴。
+--   要把 Windows 的東西貼進來，仍然用終端機自己的貼上（Ctrl+Shift+V／中鍵）。
+local osc52 = require('vim.ui.clipboard.osc52')
+local last_copied = { {}, 'v' }
+local function wrap_copy(reg)
+    local inner = osc52.copy(reg)
+    return function(lines, regtype)
+        last_copied = { lines, regtype }
+        inner(lines, regtype)
+    end
+end
+local function paste_last_copied()
+    return last_copied
+end
+vim.g.clipboard = {
+    name = 'osc52',
+    copy = { ['+'] = wrap_copy('+'), ['*'] = wrap_copy('*') },
+    paste = { ['+'] = paste_last_copied, ['*'] = paste_last_copied },
+}
+
 -- 修改「當前分頁」的名稱
 vim.api.nvim_create_user_command('TabRename', function(opts)
     -- 將名稱儲存在 Tab 的變數中
