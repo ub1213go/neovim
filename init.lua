@@ -39,6 +39,15 @@ vim.g.clipboard = {
     paste = { ['+'] = paste_last_copied, ['*'] = paste_last_copied },
 }
 
+-- 2026-08-14: 補 unnamedplus。此前整份設定都沒設 'clipboard' option，症狀是
+--   「yy 複製後 Windows 貼不出來」，但 "+yy 就正常——因為 yy 只寫 unnamed register，
+--   壓根不會呼叫上面那個 provider，OSC 52 一個位元組都沒送出去。
+--   ⚠ 診斷時整條鏈路（tmux set-clipboard on／終端機吃 OSC 52／provider 本身）
+--   全部實測通過，缺口只在這一行，而且完全沒有錯誤訊息可查。
+--   副作用：dd／x／c 這類刪除也會進 + register，等於每次小刪除都覆蓋 Windows 剪貼簿。
+--   受不了的話把這行註解掉，回頭用 "+yy 明確指定。
+vim.opt.clipboard = 'unnamedplus'
+
 -- 修改「當前分頁」的名稱
 vim.api.nvim_create_user_command('TabRename', function(opts)
     -- 將名稱儲存在 Tab 的變數中
