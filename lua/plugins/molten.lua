@@ -1,3 +1,62 @@
+-- ── # %% cell 工具 ──────────────────────────────────────────────
+-- molten 本身不認 # %%，只記得「跑過的範圍」。所以：
+--   MoltenReevaluateCell 只能重跑跑過的 cell，沒跑過／游標在 # %% 行上 → "Not in a cell"
+-- 這裡自己切 # %% 範圍，再丟給 MoltenEvaluateRange，第一次跑、重跑都能用。
+local function is_mark(l)
+  return l:match("^# %%%%") ~= nil -- Lua pattern 的 %% = 字面 %，即比對 "# %%"
+end
+
+-- 回傳整份檔案每個 cell 的 { 起始行, 結束行 }（不含 # %% 標記行本身）
+local function cell_ranges()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local ranges, start = {}, 1
+  for i, l in ipairs(lines) do
+    if is_mark(l) then
+      if i - 1 >= start then table.insert(ranges, { start, i - 1 }) end
+      start = i + 1
+    end
+  end
+  if #lines >= start then table.insert(ranges, { start, #lines }) end
+  return ranges
+end
+
+-- cell 裡有沒有真正的程式（全是空行或 # 註解就不送）
+local function has_code(r)
+  for _, l in ipairs(vim.api.nvim_buf_get_lines(0, r[1] - 1, r[2], false)) do
+    if l:match("%S") and not l:match("^%s*#") then return true end
+  end
+  return false
+end
+
+-- 執行游標所在的 cell；游標在 # %% 行上時算它底下那格
+local function run_current_cell()
+  local cur = vim.fn.line(".")
+  if is_mark(vim.fn.getline(cur)) then cur = cur + 1 end
+  for _, r in ipairs(cell_ranges()) do
+    if cur >= r[1] and cur <= r[2] then
+      if has_code(r) then
+        vim.fn.MoltenEvaluateRange(r[1], r[2])
+      else
+        vim.notify("Molten: 這個 # %% cell 沒有可執行的程式", vim.log.levels.WARN)
+      end
+      return
+    end
+  end
+  vim.notify("Molten: 這個 # %% cell 沒有可執行的程式", vim.log.levels.WARN)
+end
+
+-- 從上到下逐格執行整份檔案（每格各自保留輸出；只有註解的格子跳過）
+local function run_all_cells()
+  local n = 0
+  for _, r in ipairs(cell_ranges()) do
+    if has_code(r) then
+      vim.fn.MoltenEvaluateRange(r[1], r[2])
+      n = n + 1
+    end
+  end
+  vim.notify(("Molten: 已送出 %d 個 cell"):format(n), vim.log.levels.INFO)
+end
+
 return {
   "benlubas/molten-nvim",
   version = "^1.0.0",
@@ -42,32 +101,14 @@ return {
     { "<leader>ji", "<cmd>MoltenInit<cr>", desc = "Molten: 啟動 kernel" },
     { "<leader>jo", "<cmd>MoltenEvaluateOperator<cr>", desc = "Molten: 執行 (operator)" },
     { "<leader>jl", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: 執行當前行" },
-    { "<leader>jr", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: 重跑當前 cell" },
+    -- 2026-11-02: jr 原本是 MoltenReevaluateCell（只能重跑跑過的 cell，沒跑過或游標在 # %% 行
+    -- 上就 "Not in a cell"），改成跟 jc 一樣自己算 # %% 範圍，第一次跑、重跑都能用。
+    { "<leader>jr", run_current_cell, desc = "Molten: 執行游標所在 # %% cell" },
     { "<leader>jr", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: 執行選取" },
-    -- 自動抓游標所在的 # %% cell 範圍並執行（免手動 Visual 選取）。
-    -- molten 不認 # %%，第一次跑某段一定得給範圍；這顆替你算好範圍丟給 MoltenEvaluateRange。
-    {
-      "<leader>jc",
-      function()
-        local last = vim.fn.line("$")
-        -- 往回找最近的 # %% 標記（含當前行）；找不到代表在第一個 cell → 從檔首算
-        local mark = vim.fn.search("^# %%", "bcnW")
-        local startln = (mark == 0) and 1 or mark + 1 -- 標記行本身是分隔，從下一行開始送
-        -- 往下找下一個 # %% 標記；找不到 → 一路到檔尾
-        local nextmark = vim.fn.search("^# %%", "nW")
-        local endln = (nextmark == 0) and last or nextmark - 1
-        -- 防呆：空 cell / 範圍顛倒（游標在只有標記、無內容、或檔尾的 cell）就不送，
-        -- 否則 molten 會用無效範圍建 extmark → 之後讀位置爆 IndexError。
-        if startln > endln or startln > last then
-          vim.notify("Molten: 這個 # %% cell 沒有可執行的內容", vim.log.levels.WARN)
-          return
-        end
-        vim.fn.MoltenEvaluateRange(startln, endln)
-      end,
-      desc = "Molten: 執行游標所在 # %% cell",
-    },
-    -- 整檔當成「一個 cell」一次跑（# %% 被當註解忽略，輸出合併成一坨）
-    { "<leader>ja", "ggVG:<C-u>MoltenEvaluateVisual<cr>", desc = "Molten: 執行整個檔案" },
+    { "<leader>jc", run_current_cell, desc = "Molten: 執行游標所在 # %% cell" },
+    -- 2026-11-02: 原本是整檔當「一個 cell」跑（會把各格輸出清掉、合成一坨），
+    -- 改成從上到下逐格執行，每格各自保留輸出。
+    { "<leader>ja", run_all_cells, desc = "Molten: 逐格執行整個檔案" },
     -- 逐一重跑「已執行過」的每個 cell（各自保留各自輸出）
     { "<leader>jR", "<cmd>MoltenReevaluateAll<cr>", desc = "Molten: 重跑所有 cell" },
     { "<leader>js", "<cmd>MoltenShowOutput<cr>", desc = "Molten: 顯示輸出" },
